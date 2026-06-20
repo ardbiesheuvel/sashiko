@@ -24,10 +24,12 @@ port = 119
 # dry_run = true
 
 [ai]
-provider = "gemini"
-model = "gemini-3.1-pro-preview"
-max_input_tokens = 900000
-max_interactions = 100
+# Local patch-review setup: Claude Code CLI provider — uses your `claude` CLI
+# subscription auth, no API key, no per-token billing. Run `claude` once to log in.
+provider = "claude-cli"
+model = "claude-opus-4-8[1m]"  # latest Opus, 1M context. Lighter: "claude-sonnet-4-6[1m]"
+max_input_tokens = 950000
+max_interactions = 150
 temperature = 1.0
 
 # To use Claude API directly:
@@ -71,8 +73,8 @@ prompt_caching = true
 # thinking = "enabled"    # Enable extended thinking (or "adaptive" for Sonnet 4.6+)
 # effort = "high"         # Thinking effort: "low", "medium", "high"
 
-# [ai.claude_cli]
-# effort = "high"   # Thinking effort: "low", "medium", "high", "xhigh", "max"
+[ai.claude_cli]
+effort = "high"   # Thinking effort: "low", "medium", "high", "xhigh", "max"
 
 # [ai.vertex]
 # project_id = "my-gcp-project"  # Or set ANTHROPIC_VERTEX_PROJECT_ID env var
@@ -88,7 +90,9 @@ host = "::"
 port = 8080
 
 [git]
-repository_path = "third_party/linux"
+# Reference clone of the read-only /home/kees/src/linux tree. The patches you
+# want reviewed must exist as commits in this tree.
+repository_path = "/srv/code/sashiko-review-linux"
 
 # Track custom remotes and attempt to apply patches on their branches
 # [[git.custom_remotes]]
@@ -98,7 +102,9 @@ repository_path = "third_party/linux"
 # only_branches = []
 
 [review]
-concurrency = 16
+# claude-cli spawns one `claude` process per request; keep this low so a single
+# review doesn't fan out into your subscription's rate limit.
+concurrency = 4
 worktree_dir = "review_trees"
 timeout_seconds = 7200
 max_retries = 3
