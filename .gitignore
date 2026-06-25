@@ -5,7 +5,7 @@
 *.db-wal
 *.db.bak
 .cargo/config.toml
-target/
+/target/
 archives/
 third_party/linux/
 benchmarks/smoke-repo/
